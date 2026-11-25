@@ -5,7 +5,14 @@ from pathlib import Path
 import pytest
 
 from anp_precos import referencias
-from anp_precos.esquema import FONTES_REFERENCIA, LITROS_POR_BARRIL
+from anp_precos.esquema import (
+    ARQUIVOS_REFERENCIA,
+    COLUNAS_BOMBA,
+    FAIXA_PRECO_BOMBA,
+    FONTES_REFERENCIA,
+    LITROS_POR_BARRIL,
+    PRODUTOS_BOMBA,
+)
 
 BRONZE = "data string, valor string"
 DIARIO = "data date, brent_usd double, dolar double"
@@ -145,26 +152,127 @@ def test_variacao_usa_a_semana_exata_e_nao_a_linha_anterior(spark):
     assert quinta["var_brent_4s"] == pytest.approx(100.0 / 80.0 - 1)  # a semana 0 existe, 28 dias antes
 
 
-@pytest.mark.parametrize(
-    "arquivo,fonte,formato",
-    [("brent_usd_diario.csv", "brent", "%Y-%m-%d"), ("dolar_ptax_venda_diario.csv", "dolar", "%d/%m/%Y")],
-)
-def test_arquivos_versionados_sao_series_integras(arquivo, fonte, formato):
+BOMBA = "data_inicial string, data_final string, produto string, numero_de_postos string, unidade string, " \
+        "preco_medio_revenda string"
+
+
+def test_bomba_semanal_usa_a_segunda_feira_e_o_nome_de_produto_do_projeto(spark):
+    bronze = spark.createDataFrame(
+        [
+            ("2026-11-15", "2026-11-21", "GASOLINA COMUM", "4584", "R$/l", "6.47"),  # 15/11/2026 é domingo
+            ("2026-11-15", "2026-11-21", "OLEO DIESEL S10", "3189", "R$/l", "7.26"),
+            ("2026-11-15", "2026-11-21", "QUEROSENE", "10", "R$/l", "5.00"),  # produto fora do contrato
+            ("2026-11-15", "2026-11-21", "GNV", "358", "R$/m³", "n/d"),  # preço ilegível
+            ("2026-11-16", "2026-11-22", "GASOLINA COMUM", "4584", "R$/l", "6.50"),  # semana não começa no domingo
+            ("2026-11-08", "2026-11-14", "GASOLINA COMUM", "4504", "R$/l", "NaN"),
+            ("2026-11-01", "2026-11-07", "GASOLINA COMUM", "4500", "R$/l", "647"),  # centavos: fora da faixa
+        ],
+        BOMBA,
+    )
+    ruins = {(r["data_inicial"], r["produto_texto"]) for r in referencias.bomba_invalidas(bronze).collect()}
+    assert ruins == {
+        ("2026-11-15", "QUEROSENE"),
+        ("2026-11-15", "GNV"),
+        ("2026-11-16", "GASOLINA COMUM"),
+        ("2026-11-08", "GASOLINA COMUM"),
+        ("2026-11-01", "GASOLINA COMUM"),
+    }
+    semanal = {(r["semana"], r["produto"]): r for r in referencias.bomba_semanal(bronze).collect()}
+    segunda = dt.date(2026, 11, 16)  # a mesma semana dos microdados da ANP
+    assert set(semanal) == {(segunda, "GASOLINA"), (segunda, "DIESEL S10")}
+    assert semanal[(segunda, "GASOLINA")]["preco_medio"] == pytest.approx(6.47)
+    assert semanal[(segunda, "DIESEL S10")]["n_postos"] == 3189
+
+
+def test_tabela_do_repasse_poe_bomba_e_barril_lado_a_lado(spark):
+    s1, s2 = dt.date(2026, 11, 9), dt.date(2026, 11, 16)
+    bomba = spark.createDataFrame(
+        [(s1, "GASOLINA", 6.48, 4504), (s1, "DIESEL S10", 7.29, 3100), (s2, "GASOLINA", 6.47, 4584),
+         (s1, "GLP", 110.0, 3000)],  # GLP não entra no repasse
+        "semana date, produto string, preco_medio double, n_postos int",
+    )
+    brent = spark.createDataFrame(
+        [(s1, 92.8, 5, 5.59, 5, 3.26), (dt.date(2026, 11, 2), 100.4, 5, 5.48, 5, 3.46)],
+        "semana date, brent_usd double, dias_brent long, dolar double, dias_dolar long, brent_reais_litro double",
+    )
+    tabela = referencias.repasse_semanal(bomba, brent)
+    assert set(tabela.columns) == {"semana", "gasolina", "diesel_s10", "diesel", "etanol", "brent_usd", "dias_brent",
+                                   "dolar", "dias_dolar", "brent_reais_litro"}
+    linhas = {r["semana"]: r for r in tabela.collect()}
+    assert linhas[s1]["gasolina"] == pytest.approx(6.48) and linhas[s1]["brent_reais_litro"] == pytest.approx(3.26)
+    assert linhas[s2]["gasolina"] == pytest.approx(6.47) and linhas[s2]["brent_reais_litro"] is None
+    assert linhas[dt.date(2026, 11, 2)]["gasolina"] is None  # semana só com barril continua na tabela
+
+
+def test_macro_mensal_agrega_por_mes_e_converte_alimentos_para_reais(spark):
+    diario = spark.createDataFrame(
+        [(dt.date(2026, 3, 2), 100.0, 5.0), (dt.date(2026, 3, 3), 120.0, 5.2), (dt.date(2026, 4, 1), 90.0, 5.0)], DIARIO
+    )
+    bomba = spark.createDataFrame(
+        [(dt.date(2026, 3, 2), "DIESEL S10", 7.0, 10), (dt.date(2026, 3, 9), "DIESEL S10", 7.4, 10)],
+        "semana date, produto string, preco_medio double, n_postos int",
+    )
+    ipca = referencias.mensal(spark.createDataFrame([("01/03/2026", "1,04"), ("01/04/2026", "n/d")], BRONZE),
+                              "ipca_alimentos")
+    mundo = referencias.mensal(spark.createDataFrame([("2026-03-01", "130.5")], BRONZE), "alimentos_mundo")
+    meses = {
+        r["mes"]: r
+        for r in referencias.macro_mensal(diario, bomba, {"ipca_alimentos": ipca, "alimentos_mundo": mundo}).collect()
+    }
+    marco, abril = meses[dt.date(2026, 3, 1)], meses[dt.date(2026, 4, 1)]
+    assert marco["brent_usd"] == pytest.approx(110.0) and marco["dolar"] == pytest.approx(5.1)
+    assert marco["barril_reais"] == pytest.approx(110.0 * 5.1)
+    assert marco["diesel_s10"] == pytest.approx(7.2)
+    assert marco["ipca_alimentos"] == pytest.approx(1.04)
+    assert marco["alimentos_mundo_reais"] == pytest.approx(130.5 * 5.1)
+    assert abril["ipca_alimentos"] is None and abril["diesel_s10"] is None  # valor ilegível não vira número
+
+
+SERIES_DE_DATA_E_VALOR = [
+    ("brent", "%Y-%m-%d", 1000, 7),
+    ("dolar", "%d/%m/%Y", 1000, 7),
+    ("ipca_geral", "%d/%m/%Y", 100, 31),
+    ("ipca_alimentos", "%d/%m/%Y", 100, 31),
+    ("alimentos_mundo", "%Y-%m-%d", 100, 31),
+]
+
+
+@pytest.mark.parametrize("fonte,formato,minimo,passo_maximo", SERIES_DE_DATA_E_VALOR)
+def test_arquivos_versionados_sao_series_integras(fonte, formato, minimo, passo_maximo):
     """Sem Spark: um download ruim commitado em referencias/ tem de quebrar o CI."""
     config = FONTES_REFERENCIA[fonte]
-    with open(RAIZ / "referencias" / arquivo, encoding="utf-8-sig", newline="") as f:
+    with open(RAIZ / "referencias" / ARQUIVOS_REFERENCIA[fonte], encoding="utf-8-sig", newline="") as f:
         linhas = list(csv.reader(f, delimiter=config["sep"]))
     assert linhas[0] == list(config["colunas"])
     corpo = linhas[1:]
-    assert len(corpo) > 1000
+    assert len(corpo) > minimo
     assert all(len(linha) == 2 for linha in corpo)
 
     datas = [dt.datetime.strptime(d, formato).date() for d, _ in corpo]
     assert datas == sorted(set(datas)), "datas repetidas ou fora de ordem"
-    assert max(b - a for a, b in zip(datas, datas[1:])) <= dt.timedelta(days=7), "buraco de mais de uma semana"
-    assert all(d.weekday() < 5 for d in datas)
+    assert max(b - a for a, b in zip(datas, datas[1:])) <= dt.timedelta(days=passo_maximo), "buraco na série"
+    if passo_maximo == 7:
+        assert all(d.weekday() < 5 for d in datas)
+    else:
+        assert all(d.day == 1 for d in datas)
 
-    minimo, maximo = config["faixa"]
+    faixa_minima, faixa_maxima = config["faixa"]
     valores = [float(v.replace(",", ".")) for _, v in corpo if v not in ("", ".")]
     assert len(valores) > 0.95 * len(corpo)
-    assert all(minimo <= v <= maximo for v in valores)
+    assert all(faixa_minima <= v <= faixa_maxima for v in valores)
+
+
+def test_arquivo_versionado_da_bomba_e_integro():
+    with open(RAIZ / "referencias" / ARQUIVOS_REFERENCIA["bomba_brasil"], encoding="utf-8", newline="") as f:
+        linhas = list(csv.DictReader(f))
+    assert list(linhas[0]) == COLUNAS_BOMBA
+    assert len(linhas) > 4000
+    inicios = [dt.date.fromisoformat(linha["data_inicial"]) for linha in linhas]
+    assert all(d.weekday() == 6 for d in inicios), "a semana da ANP começa no domingo"
+    assert {linha["produto"] for linha in linhas} <= set(PRODUTOS_BOMBA)
+    minimo, maximo = FAIXA_PRECO_BOMBA
+    assert all(minimo <= float(linha["preco_medio_revenda"]) <= maximo for linha in linhas)
+    gasolina = sorted({d for d, linha in zip(inicios, linhas) if linha["produto"] == "GASOLINA COMUM"})
+    buracos = [(a, b) for a, b in zip(gasolina, gasolina[1:]) if (b - a).days != 7]
+    # as duas interrupções documentadas pela ANP: 1 semana em ago/2015 e a pesquisa suspensa em 2020
+    assert buracos == [(dt.date(2015, 8, 9), dt.date(2015, 8, 23)), (dt.date(2020, 8, 16), dt.date(2020, 10, 18))]

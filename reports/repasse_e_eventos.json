@@ -1,0 +1,244 @@
+{
+  "dados": {
+    "semanas_com_bomba": 716,
+    "semanas_com_bomba_e_barril": 510,
+    "ultima_semana_da_bomba": "2026-11-16",
+    "meses_com_ipca_de_alimentos": 119,
+    "ultimo_mes_do_ipca": "2026-10"
+  },
+  "situacao_atual": {
+    "semana": "2026-11-09",
+    "brent_usd": 92.78,
+    "dolar": 5.5851,
+    "brent_reais_litro": 3.2594,
+    "bomba": {
+      "gasolina": 6.48,
+      "diesel_s10": 7.29
+    },
+    "dolar_mais_recente": {
+      "semana": "2026-11-23",
+      "dolar": 5.9035
+    }
+  },
+  "hipoteses": {
+    "Barril e dólar ficam onde estão": {
+      "brent_usd": 92.784,
+      "dolar": 5.5851
+    },
+    "Escalada: Brent volta ao pico de 12 meses": {
+      "brent_usd": 127.432,
+      "dolar": 5.5851
+    },
+    "Escalada com dólar no máximo da série": {
+      "brent_usd": 127.432,
+      "dolar": 6.1874
+    },
+    "Alívio: Brent volta ao piso de 12 meses": {
+      "brent_usd": 60.826,
+      "dolar": 5.5851
+    }
+  },
+  "repasse": {
+    "Gasolina comum": {
+      "até mai/2023 (paridade de importação)": {
+        "semanas": 292,
+        "periodo": [
+          "2017-04-03",
+          "2023-05-08"
+        ],
+        "repasse_acumulado": {
+          "4": 0.1657,
+          "8": 0.2307,
+          "16": 0.2995
+        },
+        "ic90": {
+          "4": [
+            0.1286,
+            0.2797
+          ],
+          "8": [
+            0.1829,
+            0.3429
+          ],
+          "16": [
+            0.1997,
+            0.4421
+          ]
+        }
+      },
+      "de mai/2023 em diante": {
+        "semanas": 183,
+        "periodo": [
+          "2023-05-15",
+          "2026-11-09"
+        ],
+        "repasse_acumulado": {
+          "4": 0.0912,
+          "8": 0.0719,
+          "16": 0.0591
+        },
+        "ic90": {
+          "4": [
+            0.0064,
+            0.1386
+          ],
+          "8": [
+            -0.02,
+            0.1614
+          ],
+          "16": [
+            -0.1294,
+            0.1824
+          ]
+        }
+      }
+    },
+    "Diesel S10": {
+      "até mai/2023 (paridade de importação)": {
+        "semanas": 292,
+        "periodo": [
+          "2017-04-03",
+          "2023-05-08"
+        ],
+        "repasse_acumulado": {
+          "4": 0.1612,
+          "8": 0.225,
+          "16": 0.3283
+        },
+        "ic90": {
+          "4": [
+            0.1232,
+            0.294
+          ],
+          "8": [
+            0.1724,
+            0.3449
+          ],
+          "16": [
+            0.2109,
+            0.4841
+          ]
+        }
+      },
+      "de mai/2023 em diante": {
+        "semanas": 183,
+        "periodo": [
+          "2023-05-15",
+          "2026-11-09"
+        ],
+        "repasse_acumulado": {
+          "4": 0.2534,
+          "8": 0.2937,
+          "16": 0.3491
+        },
+        "ic90": {
+          "4": [
+            0.0742,
+            0.3581
+          ],
+          "8": [
+            0.0799,
+            0.5097
+          ],
+          "16": [
+            -0.0177,
+            0.6204
+          ]
+        }
+      }
+    }
+  },
+  "alimentos": {
+    "correlacao_com_variacao_k_meses_antes": {
+      "Dólar": {
+        "0": -0.05,
+        "1": 0.03,
+        "2": -0.06,
+        "3": 0.0,
+        "4": 0.11,
+        "5": 0.07,
+        "6": 0.19
+      },
+      "Barril em reais": {
+        "0": -0.01,
+        "1": 0.09,
+        "2": 0.07,
+        "3": 0.08,
+        "4": 0.07,
+        "5": 0.06,
+        "6": 0.06
+      },
+      "Diesel S10 na bomba": {
+        "0": 0.07,
+        "1": 0.24,
+        "2": 0.23,
+        "3": 0.17,
+        "4": 0.13,
+        "5": 0.12,
+        "6": 0.03
+      },
+      "Gasolina na bomba": {
+        "0": 0.0,
+        "1": 0.09,
+        "2": 0.09,
+        "3": 0.02,
+        "4": 0.04,
+        "5": 0.02,
+        "6": -0.03
+      },
+      "Alimentos no mundo (US$)": {
+        "0": 0.27,
+        "1": 0.32,
+        "2": 0.25,
+        "3": 0.21,
+        "4": 0.04,
+        "5": 0.02,
+        "6": -0.06
+      },
+      "Alimentos no mundo (R$)": {
+        "0": 0.17,
+        "1": 0.28,
+        "2": 0.14,
+        "3": 0.16,
+        "4": 0.13,
+        "5": 0.08,
+        "6": 0.13
+      }
+    },
+    "canais": {
+      "meses": 112,
+      "meses_com_canal_interpolado": 1,
+      "defasagens": 4,
+      "r2": 0.227,
+      "r2_ajustado": 0.151,
+      "intercepto_pct_ao_mes": 0.34,
+      "soma_dos_coeficientes": {
+        "Alimentos no mundo (R$)": 0.144,
+        "Diesel S10 na bomba": 0.092
+      },
+      "por_periodo": {
+        "antes da COVID (até fev/2020)": {
+          "meses": 38,
+          "alimentos_pct_ao_mes": 0.23,
+          "alimentos_pct_ao_ano": 2.8,
+          "meses_na_regressao": 33,
+          "contribuicao_dos_canais_pct_ao_mes": 0.16
+        },
+        "COVID e Ucrânia (mar/2020 a dez/2022)": {
+          "meses": 34,
+          "alimentos_pct_ao_mes": 0.93,
+          "alimentos_pct_ao_ano": 11.7,
+          "meses_na_regressao": 34,
+          "contribuicao_dos_canais_pct_ao_mes": 0.38
+        },
+        "de 2023 em diante": {
+          "meses": 46,
+          "alimentos_pct_ao_mes": 0.36,
+          "alimentos_pct_ao_ano": 4.5,
+          "meses_na_regressao": 45,
+          "contribuicao_dos_canais_pct_ao_mes": -0.01
+        }
+      }
+    }
+  }
+}

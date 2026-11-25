@@ -102,6 +102,63 @@ def test_gold_liga_o_barril_as_features_com_uma_semana_de_atraso(spark, tmp_path
     assert linhas[_semana(3)]["sobe_prox_semana"] == 1  # 6,30 -> 6,40: o alvo continua o mesmo
 
 
+def _series_macro(tmp_path, semanas: list[int], preco_invalido: bool = False) -> dict[str, str]:
+    """Arquivos das séries mensais e da bomba semanal, nos formatos reais."""
+    bcb = ['"data";"valor"', '"01/03/2026";"1,04"', '"01/04/2026";"0,52"']
+    fmi = ["observation_date,PFOODINDEXM", "2026-03-01,130.5", "2026-04-01,131.0"]
+    bomba = ["data_inicial,data_final,produto,numero_de_postos,unidade,preco_medio_revenda"]
+    for i in semanas:
+        domingo = _semana(i) - dt.timedelta(days=1)
+        sabado = domingo + dt.timedelta(days=6)
+        bomba.append(f"{domingo},{sabado},GASOLINA COMUM,4500,R$/l,{6.0 + 0.1 * i:.2f}")
+        bomba.append(f"{domingo},{sabado},OLEO DIESEL S10,3100,R$/l,{'abc' if preco_invalido else '7.00'}")
+    conteudos = {"ipca_geral": bcb, "ipca_alimentos": bcb, "alimentos_mundo": fmi, "bomba_brasil": bomba}
+    caminhos = {}
+    for serie, linhas in conteudos.items():
+        arquivo = tmp_path / f"{serie}.csv"
+        arquivo.write_bytes(("\n".join(linhas) + "\n").encode("utf-8"))
+        caminhos[serie] = str(arquivo)
+    return caminhos
+
+
+def test_macro_cria_as_tabelas_do_repasse_e_dos_eventos(spark, tmp_path):
+    lago = Lago(spark, em_memoria=True)
+    pipeline.rodar_referencias(spark, lago, *_referencias(tmp_path, {0: 80.0, 1: 88.0, 2: 96.8, 4: 100.0}))
+    resumo = pipeline.rodar_macro(spark, lago, _series_macro(tmp_path, [1, 2, 3]))
+
+    assert resumo == {
+        "semanas_com_bomba": 3,
+        "semanas_com_bomba_e_barril": 2,  # a semana 3 tem bomba, mas não tem barril
+        "ultima_semana_da_bomba": str(_semana(3)),
+        "meses_com_ipca_de_alimentos": 2,
+        "ultimo_mes_do_ipca": "2026-04",
+    }
+    semanal = {r["semana"]: r for r in lago.ler("gold_repasse_semanal").collect()}
+    assert semanal[_semana(1)]["gasolina"] == pytest.approx(6.10)  # domingo da ANP -> segunda do projeto
+    assert semanal[_semana(1)]["brent_usd"] == pytest.approx(88.0)
+    assert semanal[_semana(3)]["brent_reais_litro"] is None and semanal[_semana(0)]["gasolina"] is None
+    mensal = {r["mes"]: r for r in lago.ler("gold_macro_mensal").collect()}
+    assert mensal[dt.date(2026, 3, 1)]["ipca_alimentos"] == pytest.approx(1.04)
+    assert mensal[dt.date(2026, 3, 1)]["alimentos_mundo_reais"] == pytest.approx(130.5 * 5.0)
+
+
+def test_macro_sem_referencias_e_com_linha_invalida_falham_com_mensagem(spark, tmp_path):
+    with pytest.raises(RuntimeError, match="rode pipeline.rodar_referencias antes"):
+        pipeline.rodar_macro(spark, Lago(spark, em_memoria=True), _series_macro(tmp_path, [1]))
+
+    lago = Lago(spark, em_memoria=True)
+    pipeline.rodar_referencias(spark, lago, *_referencias(tmp_path, {0: 80.0, 1: 88.0}))
+    with pytest.raises(ValueError, match="Série 'bomba_brasil' tem linhas"):
+        pipeline.rodar_macro(spark, lago, _series_macro(tmp_path, [1], preco_invalido=True))
+
+    # série mensal só com cabeçalho também não passa em silêncio
+    caminhos = _series_macro(tmp_path, [1])
+    with open(caminhos["alimentos_mundo"], "w", encoding="utf-8") as f:
+        f.write("observation_date,PFOODINDEXM\n")
+    with pytest.raises(ValueError, match="Série 'alimentos_mundo' sem nenhum mês válido"):
+        pipeline.rodar_macro(spark, lago, caminhos)
+
+
 def test_brent_desatualizado_derruba_o_gold(spark, tmp_path):
     lago = _lago_com_silver(spark, [10, 11, 12])
     pipeline.rodar_referencias(spark, lago, *_referencias(tmp_path, {0: 80.0, 1: 88.0, 2: 96.8}))
