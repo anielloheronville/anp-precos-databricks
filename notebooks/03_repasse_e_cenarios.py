@@ -139,6 +139,13 @@ mostrar(Image(str(graficos.eventos_e_alimentos(eventos.preparar(mensal), EVENTOS
 # MAGIC Correlação do IPCA de alimentos do mês com a variação de cada série k meses antes, e uma regressão
 # MAGIC nos dois canais com sinal (alimentos no mundo em reais e diesel). Por período, a regressão separa
 # MAGIC a contribuição dos canais do intercepto, que é a inflação de alimentos que não depende deles.
+# MAGIC
+# MAGIC O bloco `aceleracao` diz quanto da alta dos alimentos entre o período anterior à COVID e
+# MAGIC 2020 a 2022 os canais acompanham: duas estimativas (com e sem o nível de cada período
+# MAGIC controlado), cada uma com dois intervalos de 90% (a conta inteira refeita em reamostras dos
+# MAGIC meses, e só os coeficientes), e a mesma conta em cada combinação de número de defasagens e
+# MAGIC de mês em que o período do choque termina. O resultado é uma faixa larga, não um ponto, e
+# MAGIC não prova causa.
 
 # COMMAND ----------
 
