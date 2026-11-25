@@ -1,0 +1,73 @@
+{
+  "cortes": {
+    "inicio_validacao": "2025-06-30",
+    "inicio_teste": "2025-12-29"
+  },
+  "linhas": {
+    "treino": 261619,
+    "validacao": 38526,
+    "teste": 47797
+  },
+  "taxa_de_alta": {
+    "treino": 0.2131,
+    "validacao": 0.1754,
+    "teste": 0.2408
+  },
+  "validacao": {
+    "gradient_boosting": {
+      "roc_auc": 0.7365,
+      "average_precision": 0.3989,
+      "precisao_top10pct": 0.4798
+    },
+    "logistica": {
+      "roc_auc": 0.6936,
+      "average_precision": 0.3345,
+      "precisao_top10pct": 0.4078
+    },
+    "persistencia": {
+      "roc_auc": 0.3616,
+      "average_precision": 0.1366,
+      "precisao_top10pct": 0.1332
+    }
+  },
+  "teste": {
+    "gradient_boosting": {
+      "roc_auc": 0.6889,
+      "average_precision": 0.3848,
+      "precisao_top10pct": 0.4928
+    },
+    "logistica": {
+      "roc_auc": 0.6833,
+      "average_precision": 0.4367,
+      "precisao_top10pct": 0.53
+    },
+    "persistencia": {
+      "roc_auc": 0.5178,
+      "average_precision": 0.3,
+      "precisao_top10pct": 0.42
+    }
+  },
+  "importancia_permutacao": {
+    "var_nacional_1s": 0.0953,
+    "dispersao": 0.0273,
+    "var_1s": 0.0268,
+    "var_nacional_4s": 0.0218,
+    "produto": 0.0072,
+    "n_postos": 0.0047,
+    "var_2s": 0.0034,
+    "premio_ipiranga_pct": 0.0002,
+    "regiao": -0.0002,
+    "var_4s": -0.0013,
+    "semana_do_ano": -0.0121
+  },
+  "tempos": {
+    "bronze_s": 14.8,
+    "silver_s": 52.6,
+    "gold_s": 96.0,
+    "modelo_s": 8.7
+  },
+  "linhas_gold": {
+    "mercado_semanal": 367142,
+    "features": 367142
+  }
+}

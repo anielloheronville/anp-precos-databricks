@@ -1,0 +1,9 @@
+pyspark==4.3.0
+pandas>=2.2,<3  # PySpark 4.3 ainda não suporta pandas 3
+pyarrow>=16
+numpy>=1.26
+scipy>=1.13
+scikit-learn>=1.7  # fit(X_val=, y_val=) no HistGradientBoosting
+matplotlib>=3.8
+pytest>=8
+ruff==0.17.6

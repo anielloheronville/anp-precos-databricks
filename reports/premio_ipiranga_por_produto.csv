@@ -1,0 +1,7 @@
+produto,comparacoes,municipios,premio_mediano_pct,premio_municipio_tipico_pct,ic95_inf_pct,ic95_sup_pct,pct_acima,pct_igual,pct_abaixo,wilcoxon_p
+DIESEL S10,47792,405,1.252,1.005,0.736,1.565,60.8,10.0,29.2,0.0
+ETANOL,45990,388,1.208,0.877,0.387,1.582,61.1,15.9,23.0,0.0
+GASOLINA ADITIVADA,48084,392,1.168,0.977,0.776,1.414,64.4,8.4,27.2,0.0
+DIESEL,33954,362,1.022,1.09,0.835,1.473,60.8,7.4,31.8,0.0
+GASOLINA,53276,408,0.509,0.335,0.181,0.599,59.8,18.4,21.7,0.0
+GNV,4012,55,0.0,0.0,0.0,0.0,37.5,30.9,31.6,0.0023764257787692758

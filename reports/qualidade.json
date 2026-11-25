@@ -1,0 +1,9 @@
+{
+  "linhas_bronze": 3038685,
+  "linhas_silver": 3029551,
+  "linhas_quarentena": 9114,
+  "duplicatas_removidas": 20,
+  "motivos": {
+    "linha_vazia": 9114
+  }
+}
