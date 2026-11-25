@@ -5,7 +5,7 @@ from __future__ import annotations
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as F
 
-from anp_precos.esquema import BANDEIRA_FOCO, LIMIAR_ALTA
+from anp_precos.esquema import BANDEIRA_FOCO, COLUNAS_BRENT, DEFASAGEM_BRENT_SEMANAS, LIMIAR_ALTA
 
 PRECISAO = 10000  # precisão do percentile_approx usado nos quartis
 
@@ -101,12 +101,22 @@ def _var(coluna: str, passos: int, w: Window) -> F.Column:
     )
 
 
-def features(mercado: DataFrame, nacional: DataFrame, limiar: float = LIMIAR_ALTA) -> DataFrame:
+def features(
+    mercado: DataFrame,
+    nacional: DataFrame,
+    limiar: float = LIMIAR_ALTA,
+    brent: DataFrame | None = None,
+) -> DataFrame:
     """Tabela do modelo: uma linha por município, produto e semana.
 
     Alvo `sobe_prox_semana`: a mediana do município sobe pelo menos `limiar`
     na semana SEGUINTE. Linhas sem a semana seguinte observada ficam sem alvo
     (nulo) e saem do treino, mas continuam na tabela para pontuação.
+
+    `brent` é a tabela semanal do barril em reais. A linha da semana t recebe
+    as variações medidas até t-1 (DEFASAGEM_BRENT_SEMANAS): a fonte publica o
+    Brent com cerca de uma semana de atraso, então é isso que existiria na hora
+    de prever t+1. Sem `brent`, as colunas existem e ficam nulas.
     """
     w = Window.partitionBy("uf", "municipio", "produto").orderBy("semana")
     prox_semana = F.lead("semana", 1).over(w)
@@ -124,8 +134,17 @@ def features(mercado: DataFrame, nacional: DataFrame, limiar: float = LIMIAR_ALT
         )
         .withColumn("semana_do_ano", F.weekofyear("semana"))
     )
-    return base.join(
+    saida = base.join(
         nacional.select("produto", "semana", "var_nacional_1s", "var_nacional_4s"),
         on=["produto", "semana"],
         how="left",
     )
+    colunas = [*saida.columns, *COLUNAS_BRENT]  # mesma ordem de colunas com ou sem a tabela do Brent
+    if brent is None:
+        for coluna in COLUNAS_BRENT:
+            saida = saida.withColumn(coluna, F.lit(None).cast("double"))
+        return saida.select(colunas)
+    defasado = brent.select(
+        F.date_add("semana", 7 * DEFASAGEM_BRENT_SEMANAS).alias("semana"), *COLUNAS_BRENT
+    )
+    return saida.join(defasado, on="semana", how="left").select(colunas)

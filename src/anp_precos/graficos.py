@@ -103,7 +103,7 @@ def curva_roc(resultado: dict, pasta: Path) -> Path:
 def importancia(importancias: dict, pasta: Path) -> Path:
     nomes = list(importancias)[::-1]
     valores = np.array([importancias[n] for n in nomes])
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(7, max(4, 0.32 * len(nomes))))
     ax.barh(nomes, valores, color="#d95f02")
     ax.set_xlabel("Queda no ROC AUC ao embaralhar a feature")
     ax.set_title("Importância por permutação (teste)")

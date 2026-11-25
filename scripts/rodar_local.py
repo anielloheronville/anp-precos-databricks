@@ -15,6 +15,8 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "src"))
+# workers do Spark no mesmo Python do script (no Windows, "python3" é o atalho da Microsoft Store)
+os.environ.setdefault("PYSPARK_PYTHON", sys.executable)
 
 from pyspark.sql import SparkSession  # noqa: E402
 
@@ -37,6 +39,7 @@ def sessao(nucleos: int, memoria: str) -> SparkSession:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--origem", default=str(RAIZ / "data" / "raw" / "csv"))
+    ap.add_argument("--referencias", default=str(RAIZ / "referencias"), help="pasta com os CSVs de Brent e dólar")
     ap.add_argument("--lago", default=str(RAIZ / "data" / "lago"))
     ap.add_argument("--relatorio", default=str(RAIZ / "reports"))
     ap.add_argument("--nucleos", type=int, default=6)
@@ -67,7 +70,17 @@ def main() -> None:
     qualidade = pipeline.rodar_silver(lago)
     tempos["silver_s"] = round(time.perf_counter() - t, 1)
     t = time.perf_counter()
-    pipeline.rodar_gold(lago)
+    pasta_ref = Path(args.referencias)
+    resumo_ref = pipeline.rodar_referencias(
+        spark,
+        lago,
+        str(pasta_ref / "brent_usd_diario.csv"),
+        str(pasta_ref / "dolar_ptax_venda_diario.csv"),
+    )
+    tempos["referencias_s"] = round(time.perf_counter() - t, 1)
+    print("referências:", json.dumps(resumo_ref, ensure_ascii=False))
+    t = time.perf_counter()
+    cobertura = pipeline.rodar_gold(lago)
     tempos["gold_s"] = round(time.perf_counter() - t, 1)
     relatorio.mkdir(parents=True, exist_ok=True)
     (relatorio / "qualidade.json").write_text(json.dumps(qualidade, indent=2, ensure_ascii=False), "utf-8")
@@ -84,10 +97,14 @@ def main() -> None:
     t = time.perf_counter()
     resultado = modelo.treinar_e_avaliar(feats)
     importancias = modelo.importancia_por_permutacao(resultado)
+    comparacao = modelo.comparar_sem_brent(feats, resultado)
     tempos["modelo_s"] = round(time.perf_counter() - t, 1)
 
     metricas = {k: v for k, v in resultado.items() if not k.startswith("_")}
     metricas["importancia_permutacao"] = importancias
+    metricas["efeito_do_brent"] = comparacao
+    metricas["referencias"] = resumo_ref
+    metricas["cobertura_do_brent"] = cobertura
     metricas["tempos"] = tempos
     metricas["linhas_gold"] = {"mercado_semanal": len(mercado), "features": len(feats)}
     (relatorio / "metricas_modelo.json").write_text(json.dumps(metricas, indent=2, ensure_ascii=False), "utf-8")

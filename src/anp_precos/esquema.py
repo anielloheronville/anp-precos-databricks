@@ -46,3 +46,33 @@ PRECO_MAX = 12.0
 
 # Variação semanal da mediana municipal que conta como "alta" no alvo do modelo.
 LIMIAR_ALTA = 0.005
+
+# Séries de referência (Brent e dólar): formato de cada fonte, como o arquivo chega.
+FONTES_REFERENCIA = {
+    # U.S. EIA, série DCOILBRENTEU do FRED: "2026-03-09,118.40"; feriado vem com o valor vazio
+    # faixa: valor fora dela é erro de arquivo (o Brent spot nunca saiu de 9 a 144 US$ desde 1987)
+    "brent": {
+        "sep": ",",
+        "colunas": {"observation_date": "data", "DCOILBRENTEU": "valor"},
+        "formato_data": "yyyy-MM-dd",
+        "faixa": (5.0, 300.0),
+    },
+    # Banco Central, série 1 do SGS (PTAX venda): '"09/03/2026";"5,1234"'
+    "dolar": {
+        "sep": ";",
+        "colunas": {"data": "data", "valor": "valor"},
+        "formato_data": "dd/MM/yyyy",
+        "faixa": (0.5, 20.0),
+    },
+}
+LITROS_POR_BARRIL = 158.987
+# Semana com menos cotações que isso (feriados, arquivo cortado) fica sem preço, em vez de média de 1 dia.
+MIN_DIAS_SEMANA = 3
+# Horizontes, em semanas, das variações do barril em reais usadas como feature.
+PASSOS_BRENT = (1, 4, 8)
+COLUNAS_BRENT = [f"var_brent_{passos}s" for passos in PASSOS_BRENT]
+# A EIA publica o Brent spot com cerca de uma semana de atraso: ao fim da semana t, a última semana
+# completa na fonte é t-1. A linha da semana t usa o barril até t-1, que é o que existiria na hora.
+DEFASAGEM_BRENT_SEMANAS = 1
+# Se o barril faltar em mais do que esta fração das semanas do gold_features, a carga falha.
+MAX_SEMANAS_SEM_BRENT = 0.10

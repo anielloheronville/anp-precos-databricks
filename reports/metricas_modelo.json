@@ -15,14 +15,14 @@
   },
   "validacao": {
     "gradient_boosting": {
-      "roc_auc": 0.7365,
-      "average_precision": 0.3989,
-      "precisao_top10pct": 0.4798
+      "roc_auc": 0.7517,
+      "average_precision": 0.4175,
+      "precisao_top10pct": 0.5057
     },
     "logistica": {
-      "roc_auc": 0.6936,
-      "average_precision": 0.3345,
-      "precisao_top10pct": 0.4078
+      "roc_auc": 0.6911,
+      "average_precision": 0.33,
+      "precisao_top10pct": 0.4042
     },
     "persistencia": {
       "roc_auc": 0.3616,
@@ -32,42 +32,200 @@
   },
   "teste": {
     "gradient_boosting": {
-      "roc_auc": 0.6889,
-      "average_precision": 0.3848,
-      "precisao_top10pct": 0.4928
+      "roc_auc": 0.724,
+      "average_precision": 0.4938,
+      "precisao_top10pct": 0.6244
     },
     "logistica": {
-      "roc_auc": 0.6833,
-      "average_precision": 0.4367,
-      "precisao_top10pct": 0.53
+      "roc_auc": 0.652,
+      "average_precision": 0.3869,
+      "precisao_top10pct": 0.4555
     },
     "persistencia": {
       "roc_auc": 0.5178,
       "average_precision": 0.3,
-      "precisao_top10pct": 0.42
+      "precisao_top10pct": 0.4198
+    }
+  },
+  "teste_por_produto": {
+    "DIESEL": {
+      "linhas": 8358,
+      "taxa_de_alta": 0.2606,
+      "roc_auc": 0.7592
+    },
+    "DIESEL S10": {
+      "linhas": 9249,
+      "taxa_de_alta": 0.2687,
+      "roc_auc": 0.7325
+    },
+    "ETANOL": {
+      "linhas": 9149,
+      "taxa_de_alta": 0.2092,
+      "roc_auc": 0.7153
+    },
+    "GASOLINA": {
+      "linhas": 9350,
+      "taxa_de_alta": 0.2318,
+      "roc_auc": 0.6983
+    },
+    "GASOLINA ADITIVADA": {
+      "linhas": 9263,
+      "taxa_de_alta": 0.2725,
+      "roc_auc": 0.698
+    },
+    "GNV": {
+      "linhas": 2428,
+      "taxa_de_alta": 0.1001,
+      "roc_auc": 0.6775
     }
   },
   "importancia_permutacao": {
-    "var_nacional_1s": 0.0953,
-    "dispersao": 0.0273,
-    "var_1s": 0.0268,
-    "var_nacional_4s": 0.0218,
-    "produto": 0.0072,
-    "n_postos": 0.0047,
-    "var_2s": 0.0034,
-    "premio_ipiranga_pct": 0.0002,
-    "regiao": -0.0002,
-    "var_4s": -0.0013,
-    "semana_do_ano": -0.0121
+    "var_nacional_1s": 0.0757,
+    "var_1s": 0.0245,
+    "dispersao": 0.0224,
+    "var_brent_4s": 0.0212,
+    "var_brent_8s": 0.018,
+    "var_4s": 0.01,
+    "var_nacional_4s": 0.0085,
+    "var_2s": 0.0084,
+    "produto": 0.0075,
+    "n_postos": 0.0056,
+    "premio_ipiranga_pct": 0.0027,
+    "var_brent_1s": 0.0008,
+    "regiao": -0.0008,
+    "semana_do_ano": -0.0035
+  },
+  "efeito_do_brent": {
+    "validacao": {
+      "gradient_boosting": {
+        "com_brent": {
+          "roc_auc": 0.7517,
+          "average_precision": 0.4175,
+          "precisao_top10pct": 0.5057
+        },
+        "sem_brent": {
+          "roc_auc": 0.7385,
+          "average_precision": 0.3968,
+          "precisao_top10pct": 0.4756
+        }
+      },
+      "logistica": {
+        "com_brent": {
+          "roc_auc": 0.6911,
+          "average_precision": 0.33,
+          "precisao_top10pct": 0.4042
+        },
+        "sem_brent": {
+          "roc_auc": 0.6936,
+          "average_precision": 0.3345,
+          "precisao_top10pct": 0.4078
+        }
+      }
+    },
+    "teste": {
+      "gradient_boosting": {
+        "com_brent": {
+          "roc_auc": 0.724,
+          "average_precision": 0.4938,
+          "precisao_top10pct": 0.6244
+        },
+        "sem_brent": {
+          "roc_auc": 0.6896,
+          "average_precision": 0.3818,
+          "precisao_top10pct": 0.4873
+        }
+      },
+      "logistica": {
+        "com_brent": {
+          "roc_auc": 0.652,
+          "average_precision": 0.3869,
+          "precisao_top10pct": 0.4555
+        },
+        "sem_brent": {
+          "roc_auc": 0.6833,
+          "average_precision": 0.4367,
+          "precisao_top10pct": 0.53
+        }
+      }
+    },
+    "ganho_auc_gradient_boosting": {
+      "validacao": {
+        "diferenca": 0.0133,
+        "ic90": [
+          0.0044,
+          0.0235
+        ],
+        "semanas": 25
+      },
+      "teste": {
+        "diferenca": 0.0344,
+        "ic90": [
+          0.0044,
+          0.0684
+        ],
+        "semanas": 26
+      }
+    },
+    "teste_por_produto": {
+      "DIESEL": {
+        "linhas": 8358,
+        "taxa_de_alta": 0.2606,
+        "roc_auc_com_brent": 0.7592,
+        "roc_auc_sem_brent": 0.7381
+      },
+      "DIESEL S10": {
+        "linhas": 9249,
+        "taxa_de_alta": 0.2687,
+        "roc_auc_com_brent": 0.7325,
+        "roc_auc_sem_brent": 0.697
+      },
+      "ETANOL": {
+        "linhas": 9149,
+        "taxa_de_alta": 0.2092,
+        "roc_auc_com_brent": 0.7153,
+        "roc_auc_sem_brent": 0.6915
+      },
+      "GASOLINA": {
+        "linhas": 9350,
+        "taxa_de_alta": 0.2318,
+        "roc_auc_com_brent": 0.6983,
+        "roc_auc_sem_brent": 0.6541
+      },
+      "GASOLINA ADITIVADA": {
+        "linhas": 9263,
+        "taxa_de_alta": 0.2725,
+        "roc_auc_com_brent": 0.698,
+        "roc_auc_sem_brent": 0.6398
+      },
+      "GNV": {
+        "linhas": 2428,
+        "taxa_de_alta": 0.1001,
+        "roc_auc_com_brent": 0.6775,
+        "roc_auc_sem_brent": 0.6774
+      }
+    }
+  },
+  "referencias": {
+    "dias_brent": 2526,
+    "dias_dolar": 2505,
+    "semanas": 522,
+    "semanas_com_preco": 518,
+    "primeira_semana_com_preco": "2016-12-05",
+    "ultima_semana_com_preco": "2026-11-09"
   },
   "tempos": {
-    "bronze_s": 14.8,
-    "silver_s": 52.6,
-    "gold_s": 96.0,
-    "modelo_s": 8.7
+    "bronze_s": 19.9,
+    "silver_s": 89.3,
+    "referencias_s": 7.1,
+    "gold_s": 126.5,
+    "modelo_s": 75.8
   },
   "linhas_gold": {
     "mercado_semanal": 367142,
     "features": 367142
+  },
+  "cobertura_do_brent": {
+    "semanas": 183,
+    "semanas_sem_brent": 0
   }
 }
