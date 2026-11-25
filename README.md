@@ -231,9 +231,9 @@ Só a classe `Lago` sabe onde gravar. O CI roda as transformações e o modelo e
 bronze, silver, gold, séries de referência, pipeline de ponta a ponta em memória, gravação em Parquet
 e modelo); a execução completa sobre os 3 milhões de linhas foi feita localmente (cerca de 5 minutos
 em 8 núcleos, já com o modelo treinado duas vezes para a comparação com e sem o barril) e no
-Databricks serverless (notebooks 01 e 02 em cerca de 4 minutos). As contagens de qualidade, as
-séries de referência e a regressão logística saem idênticas nos dois ambientes; o gradient boosting
-difere na terceira casa.
+Databricks serverless (notebooks 01 e 02 em cerca de 4 minutos, e o 03 em cerca de 3). As contagens
+de qualidade, as séries de referência, a regressão logística, o repasse e os cenários saem idênticos
+nos dois ambientes; o gradient boosting difere na terceira casa.
 
 ## Decisões que importam
 
