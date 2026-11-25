@@ -1,9 +1,14 @@
+import os
 import sys
 from pathlib import Path
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+# Sem isto o PySpark chama "python3" para os workers. No Windows esse nome é o atalho da
+# Microsoft Store, e todo teste que usa createDataFrame falha com "Python worker failed to connect back".
+os.environ.setdefault("PYSPARK_PYTHON", sys.executable)
 
 
 @pytest.fixture(scope="session")
