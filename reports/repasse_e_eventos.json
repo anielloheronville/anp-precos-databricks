@@ -238,6 +238,145 @@
           "meses_na_regressao": 45,
           "contribuicao_dos_canais_pct_ao_mes": -0.01
         }
+      },
+      "aceleracao": {
+        "de": "antes da COVID (até fev/2020)",
+        "para": "COVID e Ucrânia (mar/2020 a dez/2022)",
+        "alimentos_pontos_ao_mes": 0.7,
+        "alimentos_pontos_ao_mes_nos_meses_da_regressao": 0.67,
+        "sem_controle_de_periodo": {
+          "fracao_acompanhada": 0.32,
+          "ic90_da_conta_inteira": [
+            0.18,
+            0.82
+          ],
+          "ic90_dos_coeficientes": [
+            0.17,
+            0.47
+          ],
+          "por_canal": {
+            "Alimentos no mundo (R$)": 0.16,
+            "Diesel S10 na bomba": 0.16
+          }
+        },
+        "com_controle_de_periodo": {
+          "fracao_acompanhada": 0.27,
+          "ic90_da_conta_inteira": [
+            0.0,
+            0.77
+          ],
+          "ic90_dos_coeficientes": [
+            0.1,
+            0.44
+          ],
+          "por_canal": {
+            "Alimentos no mundo (R$)": 0.14,
+            "Diesel S10 na bomba": 0.13
+          },
+          "salto_sem_explicacao_pontos_ao_mes": 0.5
+        },
+        "por_defasagens_e_fim_do_choque": {
+          "1": {
+            "2022-06": {
+              "sem_controle_de_periodo": 0.23,
+              "com_controle_de_periodo": 0.16
+            },
+            "2022-12": {
+              "sem_controle_de_periodo": 0.16,
+              "com_controle_de_periodo": 0.13
+            },
+            "2023-06": {
+              "sem_controle_de_periodo": 0.08,
+              "com_controle_de_periodo": 0.08
+            }
+          },
+          "2": {
+            "2022-06": {
+              "sem_controle_de_periodo": 0.31,
+              "com_controle_de_periodo": 0.22
+            },
+            "2022-12": {
+              "sem_controle_de_periodo": 0.21,
+              "com_controle_de_periodo": 0.17
+            },
+            "2023-06": {
+              "sem_controle_de_periodo": 0.12,
+              "com_controle_de_periodo": 0.11
+            }
+          },
+          "3": {
+            "2022-06": {
+              "sem_controle_de_periodo": 0.37,
+              "com_controle_de_periodo": 0.29
+            },
+            "2022-12": {
+              "sem_controle_de_periodo": 0.26,
+              "com_controle_de_periodo": 0.21
+            },
+            "2023-06": {
+              "sem_controle_de_periodo": 0.16,
+              "com_controle_de_periodo": 0.14
+            }
+          },
+          "4": {
+            "2022-06": {
+              "sem_controle_de_periodo": 0.42,
+              "com_controle_de_periodo": 0.34
+            },
+            "2022-12": {
+              "sem_controle_de_periodo": 0.32,
+              "com_controle_de_periodo": 0.27
+            },
+            "2023-06": {
+              "sem_controle_de_periodo": 0.2,
+              "com_controle_de_periodo": 0.18
+            }
+          },
+          "6": {
+            "2022-06": {
+              "sem_controle_de_periodo": 0.51,
+              "com_controle_de_periodo": 0.42
+            },
+            "2022-12": {
+              "sem_controle_de_periodo": 0.42,
+              "com_controle_de_periodo": 0.33
+            },
+            "2023-06": {
+              "sem_controle_de_periodo": 0.28,
+              "com_controle_de_periodo": 0.23
+            }
+          },
+          "8": {
+            "2022-06": {
+              "sem_controle_de_periodo": 0.59,
+              "com_controle_de_periodo": 0.54
+            },
+            "2022-12": {
+              "sem_controle_de_periodo": 0.46,
+              "com_controle_de_periodo": 0.33
+            },
+            "2023-06": {
+              "sem_controle_de_periodo": 0.29,
+              "com_controle_de_periodo": 0.21
+            }
+          }
+        },
+        "faixa_das_especificacoes": {
+          "sem_controle_de_periodo": {
+            "combinacoes": 18,
+            "minimo": 0.08,
+            "mediana": 0.28,
+            "maximo": 0.59,
+            "com_metade_ou_mais": 2
+          },
+          "com_controle_de_periodo": {
+            "combinacoes": 18,
+            "minimo": 0.08,
+            "mediana": 0.22,
+            "maximo": 0.54,
+            "com_metade_ou_mais": 1
+          }
+        }
       }
     }
   }

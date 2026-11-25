@@ -180,10 +180,21 @@ O que mudou nos seis meses seguintes ao mês anterior a cada choque:
   e com cerca de 115 meses nada abaixo de 0,18 se distingue de zero. Uma regressão em dois canais
   (alimentos no mundo em reais e diesel) explica 23% da variação mensal, ou 15% descontado o número
   de regressores.
-- **O que sobra é grande.** Entre o período anterior à COVID e março de 2020 a dezembro de 2022, a
-  inflação de alimentos foi de 0,23% para 0,93% ao mês. A contribuição dos dois canais passou de
-  0,16 para 0,38 ponto: cerca de um terço da aceleração. O resto é o que o modelo não mede (safra,
-  clima, demanda).
+- **Os canais acompanham parte da aceleração dos alimentos, e os dados não fixam quanto.** Entre o
+  período anterior à COVID e março de 2020 a dezembro de 2022, a inflação de alimentos foi de 0,23%
+  para 0,93% ao mês; nos meses que entram na regressão, a aceleração é de 0,67 ponto. Na conta
+  principal (quatro defasagens, cada período com o seu próprio nível médio), a variação dos
+  alimentos no mundo em reais e a do diesel acompanham cerca de 27% dela. Sem o nível por período
+  dá 32%, mas essa versão tende a atribuir aos canais um salto que eles não acompanham. A margem é
+  larga: refazendo a conta inteira em reamostras dos meses, o intervalo de 90% vai de perto de zero
+  a cerca de 80%; mexendo só nos coeficientes, de cerca de 10% a cerca de 45%. As escolhas de quem
+  modela também pesam: com 1, 2, 3, 4, 6 ou 8 defasagens e o período do choque terminando em junho
+  de 2022, dezembro de 2022 ou junho de 2023, as 18 combinações vão de 8% a 54%, com mediana de
+  22%, e só uma chega à metade (oito defasagens e corte em junho de 2022). Escolhas que essa grade
+  não cobre também mexem no número: o início da série, o mês em que o choque começa, os alimentos
+  no mundo em dólares. O que os canais não acompanham, cerca de 0,5 ponto ao mês na conta
+  principal, fica fora deste modelo, que não mede safra, clima, demanda nem estoques. É a
+  decomposição de uma regressão fraca, não uma prova de causa.
 - **Um mês interpolado.** A ANP não pesquisou preços em setembro de 2020. Sem tratamento, a falta
   desse único mês de diesel tiraria da regressão seis meses, justamente os de maior inflação de
   alimentos. O diesel daquele mês é interpolado entre agosto e outubro; as médias por período usam
@@ -281,8 +292,10 @@ nos dois ambientes; o gradient boosting difere na terceira casa.
   `NaN` passava pela validação das séries e que três testes passariam com o código errado. Na parte
   de repasse e cenários, uma terceira achou uma média subestimada no texto (seis meses de 2020 fora
   da conta), um comando de atualização que esvaziaria o estudo de eventos sem dar erro, "16 semanas"
-  com dois significados e 14 de 16 mutações do código que os testes não pegavam. Tudo corrigido
-  antes de publicar.
+  com dois significados e 14 de 16 mutações do código que os testes não pegavam. Na conta de quanto
+  os canais acompanham a aceleração dos alimentos, mais duas acharam uma frase que só valia em uma
+  especificação, uma mediana errada em um ponto por arredondamento duplo e um intervalo que
+  mostrava só parte da incerteza. Tudo corrigido antes de publicar.
 
 ## Como rodar
 
