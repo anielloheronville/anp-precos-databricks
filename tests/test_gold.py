@@ -84,6 +84,39 @@ def test_features_respeitam_semana_faltante(spark):
     assert quarta["var_1s"] is None  # não compara com 2 semanas atrás fingindo ser 1
 
 
+BRENT = "semana date, var_brent_1s double, var_brent_4s double, var_brent_8s double"
+
+
+def test_brent_entra_com_uma_semana_de_atraso(spark):
+    """A fonte publica o Brent com ~1 semana de atraso: a linha de t só enxerga o barril até t-1."""
+    s = [dt.date(2026, 1, 5) + dt.timedelta(days=7 * i) for i in range(4)]
+    semanas = [(s[1], 6.00), (s[2], 6.10), (s[3], 6.20)]
+    mercado = _mercado(spark, semanas)
+    nacional = gold.nacional_semanal(
+        spark.createDataFrame([_coleta(str(i), p, "VIBRA", semana=d) for i, (d, p) in enumerate(semanas)], ESQUEMA)
+    )
+    # a tabela do Brent tem s0, s1 e s2; falta s2 -> a linha de s3 fica sem barril, mas continua na tabela
+    brent = spark.createDataFrame([(s[0], 0.01, 0.04, 0.08), (s[1], 0.30, 0.34, 0.38)], BRENT)
+    linhas = {r["semana"]: r for r in gold.features(mercado, nacional, brent=brent).collect()}
+
+    assert set(linhas) == {s[1], s[2], s[3]}  # a junção não perde nem duplica linhas
+    assert linhas[s[1]]["var_brent_1s"] == pytest.approx(0.01)  # barril de s0, nunca o de s1
+    assert linhas[s[1]]["var_brent_8s"] == pytest.approx(0.08)
+    assert linhas[s[2]]["var_brent_4s"] == pytest.approx(0.34)  # barril de s1
+    assert linhas[s[3]]["var_brent_1s"] is None
+
+
+def test_sem_tabela_do_brent_as_colunas_existem_e_ficam_nulas(spark):
+    s0 = dt.date(2026, 1, 5)
+    mercado = _mercado(spark, [(s0, 6.00)])
+    nacional = gold.nacional_semanal(spark.createDataFrame([_coleta("1", 6.0, "VIBRA", semana=s0)], ESQUEMA))
+    sem = gold.features(mercado, nacional)
+    com = gold.features(mercado, nacional, brent=spark.createDataFrame([], BRENT))
+    linha = sem.collect()[0]
+    assert linha["var_brent_1s"] is None and linha["var_brent_4s"] is None and linha["var_brent_8s"] is None
+    assert sem.columns == com.columns  # mesmo esquema nos dois caminhos
+
+
 def test_alvo_usa_limiar(spark):
     s0 = dt.date(2026, 1, 5)
     mercado = _mercado(spark, [(s0, 6.00), (s0 + dt.timedelta(days=7), 6.02)])  # +0,33%
