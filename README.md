@@ -68,9 +68,10 @@ Leitura honesta:
 
 - **O barril ajuda o boosting.** O AUC sobe de 0,739 para 0,752 na validação e de 0,690 para 0,724
   no teste. Reamostrando semanas inteiras, o ganho é de +0,013 na validação (intervalo de 90%: +0,004
-  a +0,024) e de +0,034 no teste (+0,004 a +0,068). A decisão de manter a feature se apoia na
-  validação; o teste só confirma. Entre os 10% de mercados mais prováveis, 62% subiram de fato,
-  contra 24% de média.
+  a +0,024) e de +0,034 no teste (+0,004 a +0,068). No Databricks a mesma comparação deu +0,015 na
+  validação (+0,007 a +0,024) e +0,028 no teste (-0,002 a +0,063): o ganho da validação se repete,
+  o do teste é positivo mas o intervalo encosta no zero. A decisão de manter a feature se apoia na
+  validação. Entre os 10% de mercados mais prováveis, 62% subiram de fato, contra 24% de média.
 - **O ganho do teste depende de um episódio.** O teste contém a guerra do Irã: o Brent foi de US$ 70
   a mais de US$ 120 entre fevereiro e março de 2026. Em 12 das 26 semanas do teste a variação de 8
   semanas do barril está fora de tudo o que o treino viu (até +76%, contra +21% no treino), e ali
@@ -125,7 +126,10 @@ O mesmo pacote `src/anp_precos` roda **localmente** e **no Databricks** (Delta n
 Só a classe `Lago` sabe onde gravar. O CI roda as transformações e o modelo em Linux (testes de
 bronze, silver, gold, séries de referência, pipeline de ponta a ponta em memória, gravação em Parquet
 e modelo); a execução completa sobre os 3 milhões de linhas foi feita localmente (cerca de 5 minutos
-em 8 núcleos, já com o modelo treinado duas vezes para a comparação com e sem o barril).
+em 8 núcleos, já com o modelo treinado duas vezes para a comparação com e sem o barril) e no
+Databricks serverless (notebooks 01 e 02 em cerca de 4 minutos). As contagens de qualidade, as
+séries de referência e a regressão logística saem idênticas nos dois ambientes; o gradient boosting
+difere na terceira casa.
 
 ## Decisões que importam
 
