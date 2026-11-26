@@ -8,15 +8,13 @@ de coletas de jan/2023 a jun/2026, posto a posto, com a bandeira de cada revenda
 
 Perguntas de negócio:
 
-1. **Onde a Ipiranga está acima ou abaixo do mercado?** Em cada município e semana, a mediana
-   dos postos Ipiranga contra a mediana dos concorrentes do mesmo município.
-2. **O preço do município vai subir na semana que vem?** Classificação para antecipar altas de
+1. **O preço do município vai subir na semana que vem?** Classificação para antecipar altas de
    pelo menos 0,5% na mediana municipal.
-3. **O barril de petróleo ajuda a antecipar essa alta?** O Brent em reais entra como sinal, e o
+2. **O barril de petróleo ajuda a antecipar essa alta?** O Brent em reais entra como sinal, e o
    modelo é medido com e sem ele.
-4. **Quanto do barril chega à bomba, e o que isso implica se ele subir ou cair?** Repasse medido
+3. **Quanto do barril chega à bomba, e o que isso implica se ele subir ou cair?** Repasse medido
    semana a semana e cenários condicionais para gasolina e diesel.
-5. **A alta dos alimentos depois da pandemia acompanha a COVID e as guerras?** Estudo de eventos com
+4. **A alta dos alimentos depois da pandemia acompanha a COVID e as guerras?** Estudo de eventos com
    dólar, barril, diesel e alimentos.
 
 ## Resultados
